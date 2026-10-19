@@ -1,0 +1,7 @@
+ENERGIEPRIJS ZELE V4 - ZONDER BROWSER-CORS
+1. Upload ALLES naar de repository, inclusief de map .github/workflows met update-prices.yml.
+2. GitHub: Settings > Actions > General > Workflow permissions > Read and write permissions > Save (indien nodig voor jouw repo-instellingen).
+3. GitHub: Actions > Update energy prices > Run workflow. Hierdoor wordt prices.json voor het eerst aangemaakt.
+4. GitHub Pages: Settings > Pages > Deploy from a branch > main > /(root).
+5. Open de Pages URL. De browser leest alleen prices.json vanaf dezelfde GitHub Pages-site.
+De workflow haalt periodiek de publieke SmartPrice-data server-side op. Hierdoor doet de browser zelf geen cross-origin verzoek naar SmartPrice.
