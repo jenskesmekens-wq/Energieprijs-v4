@@ -1,4 +1,4 @@
-name: Update energy prices
+  name: Update energy prices
 on:
   workflow_dispatch:
   schedule:
@@ -17,39 +17,30 @@ jobs:
           curl -fsSL --retry 3 https://api.smartprice.be/api/current -o current.json
           curl -fsSL --retry 3 https://api.smartprice.be/api/prices/today -o today.json
           python3 - <<'PY'
-          import json, datetime
-          with open('current.json', encoding='utf-8') as f: current=json.load(f)
-          with open('today.json', encoding='utf-8') as f: today=json.load(f)
-          out={'updated_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'current':current,'today':today,'tomorrow':None}
+          import json, datetime, os
+          with open('current.json', encoding='utf-8') as f:
+            current=json.load(f)
 
-          import os
-os.makedirs("history", exist_ok=True)
-history_day = (current["current"]["timestamp"][:10])
-history_file = (f"history/{history_day}.json")
+          with open('today.json', encoding='utf-8') as f:
+            today=json.load(f)
 
-          with open(
-    'prices.json',
-    'w',
-    encoding='utf-8'
-) as f:
-    json.dump(
-        out,
-        f,
-        ensure_ascii=False,
-        separators=(',',':')
-    )
+          out={
+            'updated_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),
+            'current':current,
+            'today':today,
+            'tomorrow':None
+          }
 
-with open(
-    history_file,
-    'w',
-    encoding='utf-8'
-) as f:
-    json.dump(
-        out,
-        f,
-        ensure_ascii=False,
-        separators=(',',':')
-    )
+          os.makedirs("history", exist_ok=True)
+
+          history_day = current["current"]["timestamp"][:10]
+          history_file = f"history/{history_day}.json"
+
+          with open('prices.json','w',encoding='utf-8') as f:
+            json.dump(out,f,ensure_ascii=False,separators=(',',':'))
+
+          with open(history_file,'w',encoding='utf-8') as f:
+            json.dump(out,f,ensure_ascii=False,separators=(',',':'))
           PY
           rm current.json today.json
       - name: Commit fresh data
