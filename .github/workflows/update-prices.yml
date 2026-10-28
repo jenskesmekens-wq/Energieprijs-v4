@@ -21,7 +21,35 @@ jobs:
           with open('current.json', encoding='utf-8') as f: current=json.load(f)
           with open('today.json', encoding='utf-8') as f: today=json.load(f)
           out={'updated_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'current':current,'today':today,'tomorrow':None}
-          with open('prices.json','w',encoding='utf-8') as f: json.dump(out,f,ensure_ascii=False,separators=(',',':'))
+
+          import os
+os.makedirs("history", exist_ok=True)
+history_day = (current["current"]["timestamp"][:10])
+history_file = (f"history/{history_day}.json")
+
+          with open(
+    'prices.json',
+    'w',
+    encoding='utf-8'
+) as f:
+    json.dump(
+        out,
+        f,
+        ensure_ascii=False,
+        separators=(',',':')
+    )
+
+with open(
+    history_file,
+    'w',
+    encoding='utf-8'
+) as f:
+    json.dump(
+        out,
+        f,
+        ensure_ascii=False,
+        separators=(',',':')
+    )
           PY
           rm current.json today.json
       - name: Commit fresh data
@@ -29,7 +57,7 @@ jobs:
         run: |
           git config user.name "energy-price-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add prices.json
+          git add prices.json history/
           git diff --cached --quiet && exit 0
           git commit -m "Update energy prices"
           git push
